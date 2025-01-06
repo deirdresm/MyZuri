@@ -24,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		383ECA8B2D2B607C00865F54 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		38E70BB82D1CE5110047A401 /* MyZuri.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyZuri.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		38E70BCC2D1CE5130047A401 /* MyZuriTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyZuriTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		38E70BD62D1CE5130047A401 /* MyZuriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyZuriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +93,7 @@
 				38E70BCF2D1CE5130047A401 /* MyZuriTests */,
 				38E70BD92D1CE5130047A401 /* MyZuriUITests */,
 				38E70BB92D1CE5110047A401 /* Products */,
+				383ECA8B2D2B607C00865F54 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};

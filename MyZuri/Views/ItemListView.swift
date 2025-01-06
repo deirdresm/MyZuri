@@ -25,6 +25,8 @@ struct ItemListView: View {
 	}
 
 	var body: some View {
+
+		// TODO: separate sections for bought and wishlist items, preferably 2-up on wider screens.
 		 List {
 			 ForEach(items) { item in
 				 NavigationLink {

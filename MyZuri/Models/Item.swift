@@ -110,7 +110,7 @@ extension MyZuriSchemaV1 {
 			 soldOn: Date? = nil,
 			 salePrice: Double? = nil,
 			 fabric: String = "Cotton",
-			 countryOfOrigin: String = "Ghana",
+			 countryOfOrigin: String = "Kenya",
 			 notes: String = "",
 			 photo: Data? = nil,
 			 detailPhoto: Data? = nil,
