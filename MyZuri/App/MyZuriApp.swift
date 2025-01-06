@@ -12,8 +12,10 @@ import UniformTypeIdentifiers
 @main
 struct MyZuriApp: App {
     var body: some Scene {
-        DocumentGroup(editing: .myZuriDocument, migrationPlan: MyZuriMigrationPlan.self) {
-            ContentView()
+        DocumentGroup(
+			editing: .myZuriDocument,
+			migrationPlan: MyMigrationPlan.self) {
+				ContentView()
         }
     }
 }

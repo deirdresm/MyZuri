@@ -32,81 +32,47 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
 	@Query var items: [Item]
-	@State private var sortOption: SortOption
-
 	@State private var path = [Item]()
 	@State private var sortOrder = SortDescriptor(\Item.name)
 	@State private var searchText = ""
 
 
-	init(sortOption: SortOption = .purchaseDate) {
-		self.sortOption = sortOption
-
-		switch self.sortOption {
-		case .purchaseDate:
-			_items = Query(sort: [
-				SortDescriptor(\Item.boughtOn, order: .reverse),
-				SortDescriptor(\Item.name)
-				])
-		case .name:
-			_items = Query(sort: \.name, order: .forward)
-		case .itemType:
-			_items = Query(sort: [
-				SortDescriptor(\.itemCategory.description),
-				SortDescriptor(\Item.name)
-				])
-		} // switch
-	} // init
-
-    var body: some View {
-        NavigationSplitView {
+	var body: some View {
+		NavigationStack(path: $path) {
 			ItemListView(sort: [sortOrder], searchString: searchText)
 				.navigationTitle("My Zuri Items")
 				.navigationDestination(for: Item.self, destination: EditItemView.init)
 #if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+				.navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif
-			.searchable(text: $searchText)
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .topBarTrailing) {
-                    EditButton()
-                }
-#endif
-				Button(action: addItem) {
-					Label("Add Item", systemImage: "plus")
-				}
-
-				Menu("Sort", systemImage: "arrow.up.arrow.down") {
-					Picker("Sort", selection: $sortOrder) {
-						ForEach(SortOption.allCases) { sortOrder in
-							Text(sortOrder.description)
-						}
+				.searchable(text: $searchText)
+				.toolbar {
+					Button(action: addItem) {
+						Label("Add Item", systemImage: "plus")
 					}
-				}
 
-            }
-//			.onChange(of: sortOrder) { oldValue, newValue in
-//				switch self.sortOrder {
-//				case .purchaseDate:
-//					_items = Query(sort: [
-//						SortDescriptor(\Item.boughtOn, order: .reverse),
-//						SortDescriptor(\Item.name)
-//						])
-//				case .name:
-//					_items = Query(sort: \.name, order: .forward)
-//				case .itemType:
-//					_items = Query(sort: [
-//						SortDescriptor(\.itemCategory.description),
-//						SortDescriptor(\Item.name)
-//						])
-//				} // switch
-//			}
+					Menu("Sort", systemImage: "arrow.up.arrow.down") {
+						Picker("Sort", selection: $sortOrder) {
 
-        } detail: {
-            Text("Select an item")
-        }
-    }
+							Text("Name")
+								.tag(SortDescriptor(\Item.name))
+
+							Text("Date")
+								.tag([
+									SortDescriptor(\Item.boughtOn, order: .reverse),
+									SortDescriptor(\Item.name)
+								])
+							Text("Item Type")
+								.tag([SortDescriptor(\Item.itemCategory.description),
+									  SortDescriptor(\Item.name)])
+
+						} // Picker
+						.pickerStyle(.inline)
+					} // Menu
+
+				} // toolbar
+		} // NavigationStack
+	} // body
 
     private func addItem() {
         withAnimation {

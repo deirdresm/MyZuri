@@ -30,7 +30,16 @@ struct ItemListView: View {
 				 NavigationLink {
 					 EditItemView(item: item)
 				 } label: {
-					 Text(item.name)
+					 VStack {
+						 if let imageData = item.photo,
+							let platformImage = PlatformImage(data: imageData) {
+							 Image(image: platformImage)
+								 .resizable()
+								 .aspectRatio(contentMode: .fit)
+								 .frame(maxWidth: 300, maxHeight: 300)
+						 }
+						 Text(item.name)
+					 }
 				 }
 			 }
 			 .onDelete(perform: deleteItems)

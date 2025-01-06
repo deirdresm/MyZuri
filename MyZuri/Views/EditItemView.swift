@@ -22,9 +22,6 @@ struct EditItemView: View {
 
 	@State private var newPedalName = ""
     var body: some View {
-		Text("Edit Zuri Item")
-			.font(.title)
-
 		Form {
 			VStack(alignment: .leading) {
 				Text("Basic Info")
@@ -53,38 +50,66 @@ struct EditItemView: View {
 				Text("Purchase")
 					.font(.headline)
 
-				VStack {
-					Toggle("Wishlist Item?", isOn: $item.isWishlistItem)
 
-					OptionalDatePicker(  date: $item.boughtOn,
-										 title: "Purchase Date",
-										 removeTitle: "Remove purchase date",
-										 addTitle: "Add purchase date")
-
-					TextField("Purchase Price", value: $item.pricePaid, format: .currency(code: "USD"))
-#if os(iOS)
-						.keyboardType(.decimalPad)
-#endif
+				Picker("Purchase Status", selection: $item.itemStatus) {
+					ForEach(ItemStatus.allCases) { status in
+						Text(String(describing: status))
+					}
 				}
-				VStack {
-					Toggle("Sold Item?", isOn: $item.didsellItem)
-					OptionalDatePicker(  date: $item.soldOn,
-										 title: "Date Sold",
-										 removeTitle: "Remove sale date",
-										 addTitle: "Add sale date")
 
-					TextField("Sale Price", value: $item.salePrice, format: .currency(code: "USD"))
-#if os(iOS)
+
+				VStack {
+
+					switch item.itemStatus {
+					case .wishlist:
+						Text("Wishlist Item")
+					case .bought:
+						OptionalDatePicker(  date: $item.boughtOn,
+											 title: "Purchase Date",
+											 removeTitle: "Remove purchase date",
+											 addTitle: "Add purchase date")
+
+						TextField("Purchase Price", value: $item.pricePaid, format: .currency(code: "USD"))
+	#if os(iOS)
 						.keyboardType(.decimalPad)
-#endif
+	#endif
+					case .returned:
+						OptionalDatePicker(  date: $item.soldOn,
+											 title: "Date Returned",
+											 removeTitle: "Remove return date",
+											 addTitle: "Add return date")
+
+						TextField("Return Value", value: $item.salePrice, format: .currency(code: "USD"))
+	#if os(iOS)
+							.keyboardType(.decimalPad)
+	#endif
+					case .sold:
+						OptionalDatePicker(  date: $item.soldOn,
+											 title: "Date Sold",
+											 removeTitle: "Remove sale date",
+											 addTitle: "Add sale date")
+
+						TextField("Sale Price", value: $item.salePrice, format: .currency(code: "USD"))
+	#if os(iOS)
+							.keyboardType(.decimalPad)
+	#endif
+					}
+
 				}
 				TextField("Fabric", text: $item.fabric)
 				TextField("Country of Origin", text: $item.countryOfOrigin)
 				TextField("Notes", text: $item.notes)
-
+				ImageDropView(imageData: $item.photo)
+				ImageDropView(imageData: $item.detailPhoto)
 			}
-		}
-    }
+		} // Form
+		.padding(.horizontal)
+		.navigationTitle("Edit Item")
+		#if os(iOS)
+		.navigationBarTitleDisplayMode(.inline)
+		#endif
+
+    } // body
 }
 
 //#Preview {

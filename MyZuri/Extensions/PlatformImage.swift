@@ -25,6 +25,8 @@ typealias PlatformImage = NSImage
 typealias PlatformImage = UIImage
 #endif
 
+#if os(macOS)
 extension PlatformImage {
 
 }
+#endif

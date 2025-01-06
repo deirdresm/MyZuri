@@ -15,7 +15,9 @@ struct OptionalDatePicker: View {
 
 	var body: some View {
 		if let optionalDateBinding = Binding($date) {
-			DatePicker(title, selection: optionalDateBinding)
+			DatePicker( title,
+					   selection: optionalDateBinding,
+					   displayedComponents: .date)
 			Button(removeTitle) { date = nil }
 		} else {
 			Button(addTitle) { date = Date() }
