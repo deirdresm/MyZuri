@@ -39,7 +39,7 @@ struct ContentView: View {
 
 	var body: some View {
 		NavigationStack(path: $path) {
-			ItemListView(sort: sortOrder, searchString: searchText)
+			ItemGalleryView(sort: sortOrder, searchString: searchText)
 				.navigationTitle("My Zuri Items")
 				.navigationDestination(for: Item.self, destination: EditItemView.init)
 #if os(macOS)
@@ -55,7 +55,9 @@ struct ContentView: View {
 						Picker("Sort", selection: $sortOrder) {
 
 							Text("Name")
-								.tag([SortDescriptor(\Item.name)])
+								.tag([
+									SortDescriptor(\Item.name)
+								])
 
 							Text("Date")
 								.tag([
@@ -63,8 +65,10 @@ struct ContentView: View {
 									SortDescriptor(\Item.name)
 								])
 							Text("Item Type")
-								.tag([SortDescriptor(\Item.itemCategory.description),
-									  SortDescriptor(\Item.name)])
+								.tag([
+									SortDescriptor(\Item.itemCategory.description),
+									SortDescriptor(\Item.name)
+								])
 
 						} // Picker
 						.pickerStyle(.inline)

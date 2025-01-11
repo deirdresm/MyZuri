@@ -99,8 +99,10 @@ struct EditItemView: View {
 				TextField("Fabric", text: $item.fabric)
 				TextField("Country of Origin", text: $item.countryOfOrigin)
 				TextField("Notes", text: $item.notes)
-				ImageDropView(imageData: $item.photo)
-				ImageDropView(imageData: $item.detailPhoto)
+				HStack {
+					ImageDropView(imageData: $item.photo)
+					ImageDropView(imageData: $item.detailPhoto)
+				}
 			}
 		} // Form
 		.padding(.horizontal)
