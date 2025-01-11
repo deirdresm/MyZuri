@@ -27,3 +27,4 @@ Right now, it's functionally one table, as I haven't added support for the secon
 
 ### Other Issues
 1. There's no mechanism for preventing duplicates, e.g., on `Decodable` import, partly because I wanted to use iCloud (and the constraints on unique there).
+2. Fix bug in spelling of "sleeveless" in enum when more awake.
