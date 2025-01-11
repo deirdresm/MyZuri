@@ -111,7 +111,3 @@ struct EditItemView: View {
 
     } // body
 }
-
-//#Preview {
-//    EditPedalView()
-//}

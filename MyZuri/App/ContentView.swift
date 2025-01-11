@@ -33,13 +33,13 @@ struct ContentView: View {
 
 	@Query var items: [Item]
 	@State private var path = [Item]()
-	@State private var sortOrder = SortDescriptor(\Item.name)
+	@State private var sortOrder = [SortDescriptor(\Item.name)]
 	@State private var searchText = ""
 
 
 	var body: some View {
 		NavigationStack(path: $path) {
-			ItemListView(sort: [sortOrder], searchString: searchText)
+			ItemListView(sort: sortOrder, searchString: searchText)
 				.navigationTitle("My Zuri Items")
 				.navigationDestination(for: Item.self, destination: EditItemView.init)
 #if os(macOS)
@@ -55,7 +55,7 @@ struct ContentView: View {
 						Picker("Sort", selection: $sortOrder) {
 
 							Text("Name")
-								.tag(SortDescriptor(\Item.name))
+								.tag([SortDescriptor(\Item.name)])
 
 							Text("Date")
 								.tag([
