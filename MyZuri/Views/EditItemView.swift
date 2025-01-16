@@ -1,13 +1,5 @@
 //
-//  EditPedalView.swift
-//  MyZuri
-//
-//  Created by Deirdre Saoirse Moen on 12/29/24.
-//
-
-
-//
-//  EditPedalView.swift
+//  EditItemView.swift
 //  GearClosetDocument
 //
 //  Created by Deirdre Saoirse Moen on 12/22/24.
@@ -15,10 +7,13 @@
 
 import SwiftUI
 
+/// Editing version of `ShowItemView`
+
 struct EditItemView: View {
-	@Environment(\.modelContext) private var modelContext
+//	@Environment(\.modelContext) private var modelContext
 	@Bindable var item: Item
-	private let plainIntFormat = IntegerFormatStyle<Int16>()
+	private let plainInt16Format = IntegerFormatStyle<Int16>()
+	private let plainIntFormat = IntegerFormatStyle<Int>()
 
 	@State private var newPedalName = ""
     var body: some View {
@@ -33,9 +28,14 @@ struct EditItemView: View {
 
 					}
 				}
+				.onChange(of: item.itemCategory) {
+					item.itemCategoryInt = item.itemCategory.intValue
+				}
+
 #if os(iOS)
 				.pickerStyle(.wheel)
 #endif
+
 
 				Picker("Sleeve Type", selection: $item.sleeves) {
 					ForEach(SleeveType.allCases) { sleeve in
@@ -56,7 +56,11 @@ struct EditItemView: View {
 						Text(String(describing: status))
 					}
 				}
+				.onChange(of: item.itemStatus) {
+					item.itemStatusInt = item.itemStatus.intValue
+				}
 
+				TextField("Purchase Status Value", value: $item.itemStatusInt, format: .number)
 
 				VStack {
 

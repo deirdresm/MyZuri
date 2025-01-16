@@ -31,24 +31,37 @@ enum SortOption: String, Identifiable, CaseIterable, CustomStringConvertible {
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
-	@Query var items: [Item]
-	@State private var path = [Item]()
-	@State private var sortOrder = [SortDescriptor(\Item.name)]
-	@State private var searchText = ""
+	@State private var editing = false	// toggles editing for subviews
 
+	@Query var items: [Item]
+	@State private var path: [Item] = []
+	@State private var sortOrder = [	SortDescriptor(\Item.itemStatusInt),
+									SortDescriptor(\Item.itemCategoryInt),
+									SortDescriptor(\Item.name)
+								]
+	@State private var searchText = ""
 
 	var body: some View {
 		NavigationStack(path: $path) {
-			ItemGalleryView(sort: sortOrder, searchString: searchText)
-				.navigationTitle("My Zuri Items")
-				.navigationDestination(for: Item.self, destination: EditItemView.init)
+			VStack {
+				ItemGallery(sort: sortOrder, searchString: searchText, editing: $editing)
+					.navigationTitle("My Zuri Items")
+					.navigationDestination(for: Item.self, destination: EditItemView.init)
 #if os(macOS)
-				.navigationSplitViewColumnWidth(min: 180, ideal: 200)
+					.navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif
-				.searchable(text: $searchText)
+					.searchable(text: $searchText)
+					.padding(10)
+				}
 				.toolbar {
 					Button(action: addItem) {
 						Label("Add Item", systemImage: "plus")
+					}
+
+					Button {
+						editing.toggle()
+					} label: {
+						Image(systemName: editing ? "pencil.and.scribble" : "pencil.slash" )
 					}
 
 					Menu("Sort", systemImage: "arrow.up.arrow.down") {
@@ -56,17 +69,16 @@ struct ContentView: View {
 
 							Text("Name")
 								.tag([
+									SortDescriptor(\Item.itemStatusInt),
+									SortDescriptor(\Item.itemCategoryInt),
 									SortDescriptor(\Item.name)
 								])
 
 							Text("Date")
 								.tag([
+									SortDescriptor(\Item.itemStatusInt),
 									SortDescriptor(\Item.boughtOn, order: .reverse),
-									SortDescriptor(\Item.name)
-								])
-							Text("Item Type")
-								.tag([
-									SortDescriptor(\Item.itemCategory.description),
+									SortDescriptor(\Item.itemCategoryInt),
 									SortDescriptor(\Item.name)
 								])
 
@@ -82,6 +94,7 @@ struct ContentView: View {
         withAnimation {
             let newItem = Item()
             modelContext.insert(newItem)
+//			path.append(newItem)
         }
     }
 

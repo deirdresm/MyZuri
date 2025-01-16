@@ -1,23 +1,17 @@
 //
-//  Item.swift
+//  ItemV1.swift
 //  MyZuri
 //
-//  Created by Deirdre Saoirse Moen on 12/25/24.
+//  Created by Deirdre Saoirse Moen on 1/11/25.
 //
 
 import Foundation
 import SwiftData
 
-typealias Item = MyZuriSchemaV2.Item
-typealias ItemCategory = MyZuriSchemaV2.ItemCategory
-typealias SleeveType = MyZuriSchemaV2.SleeveType
-typealias ItemStatus = MyZuriSchemaV2.ItemStatus
-typealias ItemColor = MyZuriSchemaV2.ItemColor
-
-extension MyZuriSchemaV2 {
+extension MyZuriSchemaV1 {
 
 	/// `ItemStatus` - Have we bought this yet?
-	enum ItemStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
+	enum ItemStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible {
 		case wishlist
 		case bought
 		case returned
@@ -34,25 +28,13 @@ extension MyZuriSchemaV2 {
 			case .sold: return "Sold"
 			}
 		}
-
-		/// `intValue` (to save as integer for sorting purposes)
-		var intValue: Int {
-			switch self {
-			case .wishlist: return 1
-			case .bought: return 0
-			case .returned: return 3
-			case .sold: return 4
-			}
-		}
 	}
 
 	/// `ItemCategory` - What general type of item is it?
-	enum ItemCategory: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
+	enum ItemCategory: String, Identifiable, Codable, CaseIterable, CustomStringConvertible {
 		case blouse
 		case standardDress
 		case longDress
-		case bowlOrBag
-		case scarfOrShawl
 		case otherItem
 
 		var id: Self { self }
@@ -63,27 +45,13 @@ extension MyZuriSchemaV2 {
 			case .blouse: return "Blouse"
 			case .standardDress: return "Standard Dress"
 			case .longDress: return "Long Dress"
-			case .bowlOrBag: return "Bowl or Bag"
-			case .scarfOrShawl: return "Scarf or Shawl"
 			case .otherItem: return "Other Item"
-			}
-		}
-
-		/// `intValue` (to save as integer for sorting purposes)
-		var intValue: Int {
-			switch self {
-			case .blouse: return 1
-			case .standardDress: return 2
-			case .longDress: return 3
-			case .bowlOrBag: return 4
-			case .scarfOrShawl: return 5
-			case .otherItem: return 6
 			}
 		}
 	}
 
 	/// `SleeveType` - What type of sleeves does it have, if any?
-	enum SleeveType: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
+	enum SleeveType: String, Identifiable, Codable, CaseIterable, CustomStringConvertible {
 		case sleeveless
 		case shortSleeves
 		case longSleeves
@@ -94,7 +62,7 @@ extension MyZuriSchemaV2 {
 		/// `description` for UI elements
 		var description: String {
 			switch self {
-			case .sleeveless: return "Sleeveless"
+			case .sleeveless: return "Sleveless"
 			case .shortSleeves: return "Short Sleeves"
 			case .longSleeves: return "Long Sleeves"
 			case .notApplicable: return "Not Applicable"
@@ -103,7 +71,7 @@ extension MyZuriSchemaV2 {
 	}
 
 	/// `ColorProminance` - How much of this color do we have?
-	enum ColorProminance: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
+	enum ColorProminance: String, Identifiable, Codable, CaseIterable, CustomStringConvertible {
 		case mainColor
 		case accentColor
 		case bitColor
@@ -146,46 +114,11 @@ extension MyZuriSchemaV2 {
 
 		var colors: [ItemColor]
 
-		// to backstop sortability until we have the enum thing resolved
-		var itemStatusInt: Int = -1
-		var itemCategoryInt: Int = -1
-
 		@Attribute(.externalStorage)
 		var photo: Data?				// keeping it simple with one photo
 
 		@Attribute(.externalStorage)
 		var detailPhoto: Data?			// second photo to show fabric closeup
-
-		@Transient
-		static var dateFormatter = DateFormatter()
-		@Transient
-		static var numberFormatter = NumberFormatter()
-
-		@Transient
-		func dateFormatted(_ date: Date?) -> String {
-			if let date {
-				Item.dateFormatter.timeStyle = .none
-				Item.dateFormatter.dateFormat = "dd.MM.yyyy"
-				return Item.dateFormatter.string(from: date)
-			} else {
-				return ""
-			}
-		}
-
-		@Transient
-		func numberFormatted(_ number: Double?) -> String {
-			if let number {
-				Item.numberFormatter.numberStyle = .currency
-//				Item.numberFormatter.currencyCode = currency.rawValue
-				Item.numberFormatter.maximumFractionDigits = 2
-				Item.numberFormatter.minimumFractionDigits = 2
-
-				let nsnum = NSNumber(value: number)
-				return Item.numberFormatter.string(from: nsnum) ?? ""
-			} else {
-				return ""
-			}
-		}
 
 		init(name: String = "New Item",
 			 size: String = "",
@@ -220,13 +153,6 @@ extension MyZuriSchemaV2 {
 			self.detailPhoto = detailPhoto
 			self.colors = colors
 
-			if name == "New Item" {
-				itemStatusInt = -1		// special value to put at the top of the list
-			} else {
-				self.itemStatusInt = itemStatus.intValue
-			}
-			self.itemCategoryInt = itemCategory.intValue
-
 			self.lastModified = Date()
 		}
 
@@ -253,15 +179,12 @@ extension MyZuriSchemaV2 {
 		/// Required initializer for `Decodable` conformance.
 		required public init(from decoder: any Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let tempName = try container.decode(String.self, forKey: .name)
-			name = tempName
+			name = try container.decode(String.self, forKey: .name)
 			size = try container.decode(String.self, forKey: .size)
 			lastModified = try container.decode(Date.self, forKey: .lastModified)
-			let tempitemCategory = try container.decode(ItemCategory.self, forKey: .itemCategory)
-			itemCategory = tempitemCategory
+			itemCategory = try container.decode(ItemCategory.self, forKey: .itemCategory)
 			sleeves = try container.decode(SleeveType.self, forKey: .sleeves)
-			let tempItemStatus = try container.decode(ItemStatus.self, forKey: .itemStatus)
-			itemStatus = tempItemStatus
+			itemStatus = try container.decode(ItemStatus.self, forKey: .itemStatus)
 			boughtOn = try container.decodeIfPresent(Date.self, forKey: .boughtOn)
 			pricePaid = try container.decodeIfPresent(Double.self, forKey: .pricePaid)
 			soldOn = try container.decodeIfPresent(Date.self, forKey: .soldOn)
@@ -270,13 +193,6 @@ extension MyZuriSchemaV2 {
 			countryOfOrigin = try container.decode(String.self, forKey: .countryOfOrigin)
 			notes = try container.decode(String.self, forKey: .notes)
 			colors = try container.decode([ItemColor].self, forKey: .colors)
-
-			if tempName == "New Item" {
-				itemStatusInt = -1		// special value to put at the top of the list
-			} else {
-				itemStatusInt = tempItemStatus.intValue
-			}
-			itemCategoryInt = tempitemCategory.intValue
 
 			// TODO: deal with importing/exporting photos.
 		}
