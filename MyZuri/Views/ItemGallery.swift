@@ -19,8 +19,6 @@ struct ItemGallery: View {
 		 searchString: String,
 		 editing: Binding<Bool>
 		) {
-		let boughtVal = ItemStatus.bought.intValue
-		let wishlistVal = ItemStatus.wishlist.intValue
 		_items = Query(filter: #Predicate {
 			if searchString.isEmpty {
 				return true
@@ -57,5 +55,7 @@ struct ItemGallery: View {
 }
 
 #Preview {
-	ItemListView(sort: [SortDescriptor(\Item.name)], searchString: "")
+	var editing: Binding<Bool> = .constant(false)
+
+	ItemGallery(sort: [SortDescriptor(\Item.name)], searchString: "", editing: editing)
 }

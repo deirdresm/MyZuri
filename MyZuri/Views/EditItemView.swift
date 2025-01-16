@@ -35,6 +35,7 @@ struct EditItemView: View {
 #if os(iOS)
 				.pickerStyle(.wheel)
 #endif
+				TextField("Item Category Value", value: $item.itemCategoryInt, format: .number)
 
 
 				Picker("Sleeve Type", selection: $item.sleeves) {
@@ -60,7 +61,7 @@ struct EditItemView: View {
 					item.itemStatusInt = item.itemStatus.intValue
 				}
 
-				TextField("Purchase Status Value", value: $item.itemStatusInt, format: .number)
+//				TextField("Purchase Status Value", value: $item.itemStatusInt, format: .number)
 
 				VStack {
 

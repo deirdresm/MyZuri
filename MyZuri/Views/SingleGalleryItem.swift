@@ -21,7 +21,7 @@ struct SingleGalleryItem: View {
 					.aspectRatio(contentMode: .fit)
 					.frame(maxWidth: 300, maxHeight: 300)
 			} else {
-				EmptyView()
+				Spacer() // force the label to align with those with images.
 			}
 			NavigationLink {
 				Group {
