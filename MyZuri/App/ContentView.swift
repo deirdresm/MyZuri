@@ -35,21 +35,19 @@ struct ContentView: View {
 
 	@Query var items: [Item]
 	@State private var path: [Item] = []
-	@State private var sortOrder = [	SortDescriptor(\Item.itemStatusInt),
-									SortDescriptor(\Item.itemCategoryInt),
-									SortDescriptor(\Item.name)
-								]
+	@State private var sortOrder = [
+			SortDescriptor(\Item.itemStatusInt),
+			SortDescriptor(\Item.itemCategoryInt),
+			SortDescriptor(\Item.name) ]
 	@State private var searchText = ""
 
 	var body: some View {
 		NavigationStack(path: $path) {
 			VStack {
-				ItemGallery(sort: sortOrder, searchString: searchText, editing: $editing)
+				ItemGallery(sort: sortOrder, searchString: searchText,
+					editing: $editing)
 					.navigationTitle("My Zuri Items")
 					.navigationDestination(for: Item.self, destination: EditItemView.init)
-#if os(macOS)
-					.navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
 					.searchable(text: $searchText)
 					.padding(10)
 				}

@@ -23,6 +23,23 @@ struct SingleGalleryItem: View {
 			} else {
 				Spacer() // force the label to align with those with images.
 			}
+
+			GeometryReader { geo in
+				if item.colors.count > 0 {
+					HStack {
+						ForEach(item.colors, id: \.self) { color in
+							Color(cgColor: color.cgColor)
+								.frame(minWidth: 20, idealWidth: calcColorTabWidth(geoWidth: geo.size.width), maxWidth: geo.size.width, minHeight: 20)
+						}
+					}
+					.frame(idealWidth: geo.size.width, idealHeight: 20)
+				} else {
+					Color.clear
+						.frame(idealWidth: geo.size.width, idealHeight: 20)
+				}
+			} // GeometryReader
+			.frame(maxHeight: 20)
+
 			NavigationLink {
 				Group {
 					if editing {
@@ -36,6 +53,11 @@ struct SingleGalleryItem: View {
 				Text(item.name)
 			}
 		}
+	}
+
+	func calcColorTabWidth(geoWidth: CGFloat) -> CGFloat {
+		let marginWidths = item.colors.count >= 2 ? CGFloat((item.colors.count - 1) * 10) : CGFloat(0)
+		return max((geoWidth - marginWidths)/CGFloat(item.colors.count), 20.0)
 	}
 }
 

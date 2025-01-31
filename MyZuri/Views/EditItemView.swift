@@ -103,7 +103,16 @@ struct EditItemView: View {
 				}
 				TextField("Fabric", text: $item.fabric)
 				TextField("Country of Origin", text: $item.countryOfOrigin)
-				TextField("Notes", text: $item.notes)
+				VStack(alignment: .leading) {
+					TextEditor(text: $item.notes)
+						.font(.system(size: 17))
+						.frame(minHeight: 50, maxHeight: 300)
+						.fixedSize(horizontal: false, vertical: true)
+						.multilineTextAlignment(.leading)
+						.navigationTitle("Notes")
+				}
+
+				ItemColorBarView(itemColors: $item.itemColors, item: item)
 				HStack {
 					ImageDropView(imageData: $item.photo)
 					ImageDropView(imageData: $item.detailPhoto)

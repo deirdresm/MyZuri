@@ -4,7 +4,7 @@
 * SwiftData
 * Document-based app
 
-Right now, it's functionally one table, as I haven't added support for the second table (`ItemColor`) yet or made more than a basic functioning UI.
+This is a one-model app (`Item`), and all other features are handled by enum.
 
 ![App screenshot showing Zuri dress that's Swifty](ReadmeImages/zuri-aerie-screenshot.png "App screenshot showing Zuri dress that's Swifty")
 

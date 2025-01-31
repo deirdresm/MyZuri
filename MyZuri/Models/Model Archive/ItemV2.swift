@@ -1,22 +1,14 @@
 //
-//  Item.swift
+//  ItemV2.swift
 //  MyZuri
 //
-//  Created by Deirdre Saoirse Moen on 12/25/24.
+//  Created by Deirdre Saoirse Moen on 1/30/25.
 //
 
 import Foundation
 import SwiftData
 
-typealias Item = MyZuriSchemaV2p1.Item
-typealias ItemCategory = MyZuriSchemaV2p1.ItemCategory
-typealias SleeveType = MyZuriSchemaV2p1.SleeveType
-typealias ItemStatus = MyZuriSchemaV2p1.ItemStatus
-typealias ItemColor = MyZuriSchemaV2p1.ItemColor
-typealias ColorProminance = MyZuriSchemaV2p1.ColorProminance
-typealias ProductColor = MyZuriSchemaV2p1.ProductColor
-
-extension MyZuriSchemaV2p1 {
+extension MyZuriSchemaV2 {
 
 	/// `ItemStatus` - Have we bought this yet?
 	enum ItemStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
@@ -150,8 +142,6 @@ extension MyZuriSchemaV2p1 {
 
 		var colors: [ItemColor]
 
-		var itemColors: [ProductColor]
-
 		// to backstop sortability until we have the enum thing resolved
 		var itemStatusInt: Int = -1
 		var itemCategoryInt: Int = -1
@@ -193,21 +183,6 @@ extension MyZuriSchemaV2p1 {
 			}
 		}
 
-		func makeProductColorsFromItemColors() {
-			// don't add product colors if we already have them
-			print("Item \(name) itemColors.count \(itemColors.count) (new product colors)")			
-			guard itemColors.count == 0 else { return }
-			// don't bother if we don't have any old style colors defined, either
-			print("Item \(name) colors.count \(colors.count) (old item colors)")
-			guard colors.count > 0 else { return }
-
-			for color in colors {
-				let productColor = ProductColor(id: UUID(), name: color.name, colorFamily: color.colorFamily, red: color.red, green: color.green, blue: color.blue, alpha: color.alpha, item: self)
-				itemColors.append(productColor)
-			}
-			print("Item \(name) itemColors.count \(itemColors.count) (new product colors after insert)\n")
-		}
-
 		init(name: String = "New Item",
 			 size: String = "",
 			 itemCategory: ItemCategory = .blouse,
@@ -222,8 +197,7 @@ extension MyZuriSchemaV2p1 {
 			 notes: String = "",
 			 photo: Data? = nil,
 			 detailPhoto: Data? = nil,
-			 colors: [ItemColor] = [],
-			 productColors: [ProductColor] = []
+			 colors: [ItemColor] = []
 		) {
 			self.name = name
 			self.size = size
@@ -241,8 +215,6 @@ extension MyZuriSchemaV2p1 {
 			self.photo = photo
 			self.detailPhoto = detailPhoto
 			self.colors = colors
-
-			self.itemColors = productColors
 
 			if name == "New Item" {
 				itemStatusInt = -1		// special value to put at the top of the list
@@ -272,7 +244,6 @@ extension MyZuriSchemaV2p1 {
 			case photo
 			case detailPhoto
 			case colors
-			case itemColors
 		}
 
 		/// Required initializer for `Decodable` conformance.
@@ -295,7 +266,6 @@ extension MyZuriSchemaV2p1 {
 			countryOfOrigin = try container.decode(String.self, forKey: .countryOfOrigin)
 			notes = try container.decode(String.self, forKey: .notes)
 			colors = try container.decode([ItemColor].self, forKey: .colors)
-			itemColors = try container.decode([ProductColor].self, forKey: .itemColors)
 
 			if tempName == "New Item" {
 				itemStatusInt = -1		// special value to put at the top of the list
@@ -323,7 +293,9 @@ extension MyZuriSchemaV2p1 {
 			try container.encode(fabric, forKey: .fabric)
 			try container.encode(countryOfOrigin, forKey: .countryOfOrigin)
 			try container.encode(notes, forKey: .notes)
-			try container.encode(itemColors, forKey: .itemColors)
+			try container.encode(colors, forKey: .colors)
+
+			// TODO: deal with importing/exporting photos.
 		}
 	}
 }
