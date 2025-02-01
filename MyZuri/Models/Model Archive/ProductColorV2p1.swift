@@ -1,8 +1,8 @@
 //
-//  ProductColor.swift
+//  ProductColorV2p2.swift
 //  MyZuri
 //
-//  Created by Deirdre Saoirse Moen on 1/30/25.
+//  Created by Deirdre Saoirse Moen on 1/31/25.
 //
 
 import Foundation
@@ -10,7 +10,7 @@ import SwiftData
 import Observation
 import CoreGraphics
 
-extension MyZuriSchemaV2p2 {
+extension MyZuriSchemaV2p1 {
 	@Model
 	public class ProductColor: Codable {
 		var id: UUID

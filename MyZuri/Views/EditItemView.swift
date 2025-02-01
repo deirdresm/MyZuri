@@ -29,14 +29,8 @@ struct EditItemView: View {
 					}
 				}
 				.onChange(of: item.itemCategory) {
-					item.itemCategoryInt = item.itemCategory.intValue
+					item.itemCategoryText = item.itemCategory.description
 				}
-
-#if os(iOS)
-				.pickerStyle(.wheel)
-#endif
-				TextField("Item Category Value", value: $item.itemCategoryInt, format: .number)
-
 
 				Picker("Sleeve Type", selection: $item.sleeves) {
 					ForEach(SleeveType.allCases) { sleeve in
@@ -44,9 +38,10 @@ struct EditItemView: View {
 
 					}
 				}
-#if os(iOS)
-				.pickerStyle(.wheel)
-#endif
+				.onChange(of: item.sleeves) {
+					item.sleeveTypeText = item.sleeves.description
+				}
+
 
 				Text("Purchase")
 					.font(.headline)
@@ -58,10 +53,8 @@ struct EditItemView: View {
 					}
 				}
 				.onChange(of: item.itemStatus) {
-					item.itemStatusInt = item.itemStatus.intValue
+					item.itemStatusText = item.itemStatus.description
 				}
-
-//				TextField("Purchase Status Value", value: $item.itemStatusInt, format: .number)
 
 				VStack {
 
@@ -112,7 +105,8 @@ struct EditItemView: View {
 						.navigationTitle("Notes")
 				}
 
-				ItemColorBarView(itemColors: $item.itemColors, item: item)
+				ItemColorBarView(item: $item)
+
 				HStack {
 					ImageDropView(imageData: $item.photo)
 					ImageDropView(imageData: $item.detailPhoto)

@@ -1,20 +1,14 @@
 //
-//  Item.swift
+//  ItemV2p1.swift
 //  MyZuri
 //
-//  Created by Deirdre Saoirse Moen on 12/25/24.
+//  Created by Deirdre Saoirse Moen on 1/31/25.
 //
 
 import Foundation
 import SwiftData
 
-typealias Item = MyZuriSchemaV2p2.Item
-typealias ItemCategory = MyZuriSchemaV2p2.ItemCategory
-typealias SleeveType = MyZuriSchemaV2p2.SleeveType
-typealias ItemStatus = MyZuriSchemaV2p2.ItemStatus
-typealias ProductColor = MyZuriSchemaV2p2.ProductColor
-
-extension MyZuriSchemaV2p2 {
+extension MyZuriSchemaV2p1 {
 
 	/// `ItemStatus` - Have we bought this yet?
 	enum ItemStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
@@ -146,14 +140,13 @@ extension MyZuriSchemaV2p2 {
 		var countryOfOrigin: String	// Ghana, India, etc.
 		var notes: String				// thoughts about the item
 
-		// following added in V2p1
+		var colors: [ItemColor]
+
 		var itemColors: [ProductColor]
 
-		// following added in V2p2
-		var isNewItem: Bool = false
-		var itemStatusText: String = ""
-		var sleeveTypeText: String = ""
-		var itemCategoryText: String = ""
+		// to backstop sortability until we have the enum thing resolved
+		var itemStatusInt: Int = -1
+		var itemCategoryInt: Int = -1
 
 		@Attribute(.externalStorage)
 		var photo: Data?				// keeping it simple with one photo
@@ -192,21 +185,37 @@ extension MyZuriSchemaV2p2 {
 			}
 		}
 
-		init(	name: String = "New Item",
-				size: String = "",
-				itemCategory: ItemCategory = .blouse,
-				sleeves: SleeveType = .longSleeves,
-				itemStatus: ItemStatus = .wishlist,
-				boughtOn: Date? = nil,
-				pricePaid: Double? = nil,
-				soldOn: Date? = nil,
-				salePrice: Double? = nil,
-				fabric: String = "Cotton",
-				countryOfOrigin: String = "Kenya",
-				notes: String = "",
-				photo: Data? = nil,
-				detailPhoto: Data? = nil,
-				itemColors: [ProductColor] = []
+		func makeProductColorsFromItemColors() {
+			// don't add product colors if we already have them
+			print("Item \(name) itemColors.count \(itemColors.count) (new product colors)")
+			guard itemColors.count == 0 else { return }
+			// don't bother if we don't have any old style colors defined, either
+			print("Item \(name) colors.count \(colors.count) (old item colors)")
+			guard colors.count > 0 else { return }
+
+			for color in colors {
+				let productColor = ProductColor(id: UUID(), name: color.name, colorFamily: color.colorFamily, red: color.red, green: color.green, blue: color.blue, alpha: color.alpha, item: self)
+				itemColors.append(productColor)
+			}
+			print("Item \(name) itemColors.count \(itemColors.count) (new product colors after insert)\n")
+		}
+
+		init(name: String = "New Item",
+			 size: String = "",
+			 itemCategory: ItemCategory = .blouse,
+			 sleeves: SleeveType = .longSleeves,
+			 itemStatus: ItemStatus = .wishlist,
+			 boughtOn: Date? = nil,
+			 pricePaid: Double? = nil,
+			 soldOn: Date? = nil,
+			 salePrice: Double? = nil,
+			 fabric: String = "Cotton",
+			 countryOfOrigin: String = "Kenya",
+			 notes: String = "",
+			 photo: Data? = nil,
+			 detailPhoto: Data? = nil,
+			 colors: [ItemColor] = [],
+			 productColors: [ProductColor] = []
 		) {
 			self.name = name
 			self.size = size
@@ -223,17 +232,16 @@ extension MyZuriSchemaV2p2 {
 
 			self.photo = photo
 			self.detailPhoto = detailPhoto
+			self.colors = colors
 
-			self.itemColors = itemColors
+			self.itemColors = productColors
 
 			if name == "New Item" {
-				isNewItem = true
+				itemStatusInt = -1		// special value to put at the top of the list
 			} else {
-				isNewItem = false
+				self.itemStatusInt = itemStatus.intValue
 			}
-			itemStatusText = itemStatus.description
-			sleeveTypeText = sleeves.description
-			itemCategoryText = itemCategory.description
+			self.itemCategoryInt = itemCategory.intValue
 
 			self.lastModified = Date()
 		}
@@ -278,14 +286,15 @@ extension MyZuriSchemaV2p2 {
 			fabric = try container.decode(String.self, forKey: .fabric)
 			countryOfOrigin = try container.decode(String.self, forKey: .countryOfOrigin)
 			notes = try container.decode(String.self, forKey: .notes)
+			colors = try container.decode([ItemColor].self, forKey: .colors)
 			itemColors = try container.decode([ProductColor].self, forKey: .itemColors)
 
 			if tempName == "New Item" {
-				itemStatusText = ""		// special value to put at the top of the list
+				itemStatusInt = -1		// special value to put at the top of the list
 			} else {
-				itemStatusText = tempItemStatus.description
+				itemStatusInt = tempItemStatus.intValue
 			}
-			itemCategoryText = tempitemCategory.description
+			itemCategoryInt = tempitemCategory.intValue
 
 			// TODO: deal with importing/exporting photos.
 		}

@@ -9,24 +9,18 @@ import Foundation
 import SwiftData
 
 extension Item {
+	static var previewShirt: Item = {
+		var itemColor = ProductColor(	id: UUID(),
+										name: "Indigo",
+										colorFamily: "Indigo",
+										red: 0.1953125,
+										green: 0.171875,
+										blue: 0.45703125,
+										alpha: 1,
+										item: Item.previewShirt)
 
-	static var previewShirt: Item {
-		Item(name: "Preview Shirt",
-			 size: "2X",
-			 itemCategory: .blouse,
-			 sleeves: .longSleeves,
-			 itemStatus: .wishlist,
-			 boughtOn: nil,
-			 pricePaid: nil,
-			 soldOn: nil,
-			 salePrice: 140.0,
-			 fabric: "Cotton",
-			 countryOfOrigin: "Kenya",
-			 notes: "",
-			 photo: nil,
-			 detailPhoto: nil,
-			 colors: [],
-			 productColors: []
-		)
-	}
+		return Item(name: "Preview Shirt",
+					size: "2X",
+					itemColors: [itemColor])
+	}()
 }

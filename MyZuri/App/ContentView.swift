@@ -36,8 +36,8 @@ struct ContentView: View {
 	@Query var items: [Item]
 	@State private var path: [Item] = []
 	@State private var sortOrder = [
-			SortDescriptor(\Item.itemStatusInt),
-			SortDescriptor(\Item.itemCategoryInt),
+			SortDescriptor(\Item.itemStatusText),
+			SortDescriptor(\Item.itemCategoryText),
 			SortDescriptor(\Item.name) ]
 	@State private var searchText = ""
 
@@ -67,16 +67,16 @@ struct ContentView: View {
 
 							Text("Name")
 								.tag([
-									SortDescriptor(\Item.itemStatusInt),
-									SortDescriptor(\Item.itemCategoryInt),
+									SortDescriptor(\Item.itemStatusText),
+									SortDescriptor(\Item.itemCategoryText),
 									SortDescriptor(\Item.name)
 								])
 
 							Text("Date")
 								.tag([
-									SortDescriptor(\Item.itemStatusInt),
+									SortDescriptor(\Item.itemStatusText),
 									SortDescriptor(\Item.boughtOn, order: .reverse),
-									SortDescriptor(\Item.itemCategoryInt),
+									SortDescriptor(\Item.itemCategoryText),
 									SortDescriptor(\Item.name)
 								])
 

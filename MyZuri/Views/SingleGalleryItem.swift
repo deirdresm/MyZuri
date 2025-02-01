@@ -25,9 +25,9 @@ struct SingleGalleryItem: View {
 			}
 
 			GeometryReader { geo in
-				if item.colors.count > 0 {
+				if item.itemColors.count > 0 {
 					HStack {
-						ForEach(item.colors, id: \.self) { color in
+						ForEach(item.itemColors, id: \.self) { color in
 							Color(cgColor: color.cgColor)
 								.frame(minWidth: 20, idealWidth: calcColorTabWidth(geoWidth: geo.size.width), maxWidth: geo.size.width, minHeight: 20)
 						}
@@ -56,8 +56,8 @@ struct SingleGalleryItem: View {
 	}
 
 	func calcColorTabWidth(geoWidth: CGFloat) -> CGFloat {
-		let marginWidths = item.colors.count >= 2 ? CGFloat((item.colors.count - 1) * 10) : CGFloat(0)
-		return max((geoWidth - marginWidths)/CGFloat(item.colors.count), 20.0)
+		let marginWidths = item.itemColors.count >= 2 ? CGFloat((item.itemColors.count - 1) * 10) : CGFloat(0)
+		return max((geoWidth - marginWidths)/CGFloat(item.itemColors.count), 20.0)
 	}
 }
 

@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct ItemColorBarView: View {
-	@Binding var itemColors: [ProductColor]
-	let item: Item
-	@State private var selectedItemIndex: Int = 0
+	@Bindable var item: Item
+	@State private var selectedColorIndex: Int = -1
 	@State private var shouldPresentSheet: Bool = false
+
+	init(item: Bindable<Item>) {
+		_item = item
+		if item.itemColors.count > 0 {
+			selectedColorIndex = 0
+		}
+	}
 
     var body: some View {
 		HStack {
@@ -24,14 +30,21 @@ struct ItemColorBarView: View {
 			.frame(idealWidth: 75, idealHeight: 75)
 			.onTapGesture(count: 1) {
 				addItemColor()
+				if selectedColorIndex == -1 {
+					selectedColorIndex = 0
+				}
 			}
 
-			ForEach(itemColors.indices, id: \.self) { index in
+			ForEach(item.itemColors) { itemColor in
 				Circle()
-					.fill(Color(cgColor: itemColors[index].cgColor))
+					.fill(Color(cgColor: itemColor.cgColor))
 					.frame(idealWidth: 75, idealHeight: 75, maxHeight: 75)
 					.onTapGesture(count: 1) {
-						selectedItemIndex = index
+						if let index = item.itemColors.firstIndex(of: itemColor) {
+							selectedColorIndex = index
+						} else {
+							selectedColorIndex = 0
+						}
 						shouldPresentSheet = true
 					}
 			}
@@ -52,16 +65,23 @@ struct ItemColorBarView: View {
 		.sheet(isPresented: $shouldPresentSheet) {
 			print("Sheet dismissed!")
 		} content: {
-			EditItemColorView(itemColor: $itemColors[selectedItemIndex], swatch: item.detailPhoto)
+			EditItemColorView(item: item, itemColor: $item.itemColors[selectedColorIndex])
 		}
     }
 
 	func addItemColor() {
-		itemColors.append(ProductColor(id: UUID(), name: "New Color", colorFamily: "blue", red: 0, green: 0.25, blue: 0.95, alpha: 1, item: item))
+		item.itemColors.append(
+			ProductColor(id: UUID(),
+				name: "New Color",
+				colorFamily: "blue",
+				red: 0, green: 0.25, blue: 0.95, alpha: 1,
+				item: item
+			)
+		)
 	}
 
 	func removeLastItemColor() {
-		itemColors.removeLast()
+		item.itemColors.removeLast()
 	}
 }
 
@@ -74,7 +94,7 @@ struct PressButtonStyle: ButtonStyle {
 }
 
 #Preview {
-
+	@Previewable @Bindable var item = Item.previewShirt
 	@Previewable @State var itemColors = [ProductColor(	id: UUID(), name: "Indigo",
 								colorFamily: "Indigo",
 								red: 0.1953125,
@@ -83,5 +103,5 @@ struct PressButtonStyle: ButtonStyle {
 														alpha: 1, item: Item.previewShirt)]
 
 
-	ItemColorBarView(itemColors: $itemColors, item: Item.previewShirt)
+	ItemColorBarView(item: $item)
 }

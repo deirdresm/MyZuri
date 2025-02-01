@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct EditItemColorView: View {
+	let item: Item
 	@Binding var itemColor: ProductColor
-	let swatch: Data?
 
 	var body: some View {
 		VStack {
-			if let imageData = swatch,
+			if let imageData = item.detailPhoto ?? item.photo,
 				let platformImage = PlatformImage(data: imageData) {
 				Image(image: platformImage)
 					.resizable()
@@ -43,13 +43,6 @@ struct EditItemColorView: View {
 
 #Preview {
 
-	@Previewable @State var itemColor = ProductColor(	id: UUID(),
-					name: "Indigo",
-					colorFamily: "Indigo",
-					red: 0.1953125,
-					green: 0.171875,
-					blue: 0.45703125,
-					alpha: 1,
-					item: Item.previewShirt)
-	EditItemColorView(itemColor: $itemColor, swatch: nil)
+	@Previewable @State var itemColor = Item.previewShirt.itemColors[0]
+	EditItemColorView(item: Item.previewShirt, itemColor: $itemColor)
 }
