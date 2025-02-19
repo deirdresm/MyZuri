@@ -13,7 +13,6 @@ struct ShowItemView: View {
 	@Bindable var item: Item
 	private let plainIntFormat = IntegerFormatStyle<Int16>()
 
-	@State private var newPedalName = ""
 	var body: some View {
 
 		HStack {

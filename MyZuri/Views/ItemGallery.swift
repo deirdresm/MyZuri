@@ -15,15 +15,17 @@ struct ItemGallery: View {
 	@Query(sort: [SortDescriptor(\Item.boughtOn, order: .reverse), SortDescriptor(\Item.name)]) var items: [Item]
 	@Binding var editing: Bool
 
-	init(sort: [SortDescriptor<Item>],
+	init(isPurchased: Bool,
+		 sort: [SortDescriptor<Item>],
 		 searchString: String,
 		 editing: Binding<Bool>
 		) {
+		// note: don't need to store isPurchased, it just filters the items here.
 		_items = Query(filter: #Predicate {
 			if searchString.isEmpty {
-				return true
+				return isPurchased == ($0.boughtOn != nil)
 			} else {
-				return $0.name.localizedStandardContains(searchString)
+				return isPurchased == ($0.boughtOn != nil) && $0.name.localizedStandardContains(searchString)
 			}
 		}, sort: sort)
 		_editing = editing
@@ -57,5 +59,5 @@ struct ItemGallery: View {
 #Preview {
 	var editing: Binding<Bool> = .constant(false)
 
-	ItemGallery(sort: [SortDescriptor(\Item.name)], searchString: "", editing: editing)
+	ItemGallery(isPurchased: true, sort: [SortDescriptor(\Item.name)], searchString: "", editing: editing)
 }

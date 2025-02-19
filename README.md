@@ -4,7 +4,9 @@
 * SwiftData
 * Document-based app
 
-This is a one-model app (`Item`), and all other features are handled by enum.
+This is a two-model app (`Item` and `Product Color`), and all other features are handled by enum.
+
+[Migration Guide can be found here.](MyZuri/Models/Model\ Archive/AMigrationGuide.md)
 
 ![App screenshot showing Zuri dress that's Swifty](ReadmeImages/zuri-aerie-screenshot.png "App screenshot showing Zuri dress that's Swifty")
 

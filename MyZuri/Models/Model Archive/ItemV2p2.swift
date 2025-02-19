@@ -8,15 +8,9 @@
 import Foundation
 import SwiftData
 
-typealias Item = MyZuriSchemaV2p3.Item
-typealias ItemCategory = MyZuriSchemaV2p3.ItemCategory
-typealias SleeveType = MyZuriSchemaV2p3.SleeveType
-typealias ItemStatus = MyZuriSchemaV2p3.ItemStatus
-typealias ProductColor = MyZuriSchemaV2p3.ProductColor
-typealias WishlistStatus = MyZuriSchemaV2p3.WishlistStatus
 
-extension MyZuriSchemaV2p3 {
-
+extension MyZuriSchemaV2p2 {
+	
 	/// `ItemStatus` - Have we bought this yet?
 	enum ItemStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable {
 		case wishlist
@@ -121,47 +115,30 @@ extension MyZuriSchemaV2p3 {
 		}
 	}
 
-	enum WishlistStatus: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable, Comparable {
-
-		case none
-		case newItem
-		case stillOnSite
-		case recentlyDiscontinued
-		case soldOut
-		case unicorn
+	/// `ColorProminance` - How much of this color do we have?
+	enum ColorProminance: String, Identifiable, Codable, CaseIterable, CustomStringConvertible, Equatable, Sendable, Comparable {
+		case mainColor
+		case accentColor
+		case bitColor
 
 		var id: Self { self }
-		
+
+		/// `description` for UI elements
 		var description: String {
 			switch self {
-			case .none: return "None"
-			case .newItem: return "New Item"
-			case .stillOnSite: return "Still On Site"
-			case .soldOut: return "Sold Out In My Size"
-			case .recentlyDiscontinued: return "Recently Discontinued"
-			case .unicorn: return "Unicorn"
+			case .mainColor: return "Main Color"
+			case .accentColor: return "Secondary/Accent Color"
+			case .bitColor: return "Bit Color"
 			}
 		}
 
-		var intValue: Int {
-			switch self {
-			case .none: return -1
-			case .newItem: return 0
-			case .stillOnSite: return 1
-			case .soldOut: return 2
-			case .recentlyDiscontinued: return 3
-			case .unicorn: return 4
+		static func < (lhs: ColorProminance, rhs: ColorProminance) -> Bool {
+			switch (lhs, rhs) {
+			case (.mainColor, .accentColor): return true
+			case (.mainColor, .bitColor): return true
+			case (.accentColor, .bitColor): return true
+			default: return false
 			}
-		}
-
-		/// use `intValue` so we can have cases out of alphabetical order
-		static func ==(lhs: WishlistStatus, rhs: WishlistStatus) -> Bool {
-			return lhs.intValue == rhs.intValue
-		}
-
-		/// use `intValue` so we can have cases out of alphabetical order
-		static func < (lhs: WishlistStatus, rhs: WishlistStatus) -> Bool {
-			return lhs.intValue < rhs.intValue
 		}
 
 	}
@@ -194,25 +171,11 @@ extension MyZuriSchemaV2p3 {
 		var sleeveTypeText: String = ""
 		var itemCategoryText: String = ""
 
-		var wishlistStatus: WishlistStatus?
-		var wishlistStatusInt: Int = -1
-		var url: URL?
-
 		@Attribute(.externalStorage)
 		var photo: Data?				// keeping it simple with one photo
 
 		@Attribute(.externalStorage)
 		var detailPhoto: Data?			// second photo to show fabric closeup
-
-		@Transient
-		var urlPath: String {
-			get { url?.absoluteString ?? "" }
-			set(newPath) {
-				if let newPathURL = URL(string: newPath) {
-					url = newPathURL
-				} // else do nothing.
-			}
-		}
 
 		@Transient
 		static var dateFormatter = DateFormatter()
@@ -257,7 +220,6 @@ extension MyZuriSchemaV2p3 {
 				fabric: String = "Cotton",
 				countryOfOrigin: String = "Kenya",
 				notes: String = "",
-				url: URL? = nil,
 				photo: Data? = nil,
 				detailPhoto: Data? = nil,
 				itemColors: [ProductColor] = []
@@ -274,7 +236,6 @@ extension MyZuriSchemaV2p3 {
 			self.fabric = fabric
 			self.countryOfOrigin = countryOfOrigin
 			self.notes = notes
-			self.url = url
 
 			self.photo = photo
 			self.detailPhoto = detailPhoto
@@ -308,7 +269,6 @@ extension MyZuriSchemaV2p3 {
 			case fabric
 			case countryOfOrigin
 			case notes
-			case url
 			case photo
 			case detailPhoto
 			case colors
@@ -334,7 +294,6 @@ extension MyZuriSchemaV2p3 {
 			fabric = try container.decode(String.self, forKey: .fabric)
 			countryOfOrigin = try container.decode(String.self, forKey: .countryOfOrigin)
 			notes = try container.decode(String.self, forKey: .notes)
-			url = try container.decode(URL.self, forKey: .url)
 			itemColors = try container.decode([ProductColor].self, forKey: .itemColors)
 
 			if tempName == "New Item" {
@@ -363,7 +322,6 @@ extension MyZuriSchemaV2p3 {
 			try container.encode(fabric, forKey: .fabric)
 			try container.encode(countryOfOrigin, forKey: .countryOfOrigin)
 			try container.encode(notes, forKey: .notes)
-			try container.encode(url, forKey: .url)
 			try container.encode(itemColors, forKey: .itemColors)
 		}
 	}

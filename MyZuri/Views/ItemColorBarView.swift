@@ -9,17 +9,19 @@ import SwiftUI
 
 struct ItemColorBarView: View {
 	@Bindable var item: Item
-	@State private var selectedColorIndex: Int = -1
+	@State private var selectedColorIndex: Int
 	@State private var shouldPresentSheet: Bool = false
 
 	init(item: Bindable<Item>) {
 		_item = item
 		if item.itemColors.count > 0 {
 			selectedColorIndex = 0
+		} else {
+			selectedColorIndex = -1
 		}
 	}
 
-    var body: some View {
+	var body: some View {
 		HStack {
 			ZStack {
 				Color.clear
@@ -50,24 +52,24 @@ struct ItemColorBarView: View {
 			}
 
 			ZStack {
-			 Color.clear
-				 .background(.fill.tertiary)
-			 Image(systemName: "minus")
-				 .font(.largeTitle)
-		 }
-		 .frame(idealWidth: 75, idealHeight: 75)
-		 .onTapGesture(count: 1) {
-			 removeLastItemColor()
-		 }
+				Color.clear
+					.background(.fill.tertiary)
+				Image(systemName: "minus")
+					.font(.largeTitle)
+			}
+			.frame(idealWidth: 50, idealHeight: 50)
+			.onTapGesture(count: 1) {
+				removeLastItemColor()
+			}
 
 		}
-		.frame(maxWidth: .infinity, idealHeight: 75)
+		.frame(maxWidth: .infinity, idealHeight: 50)
 		.sheet(isPresented: $shouldPresentSheet) {
 			print("Sheet dismissed!")
 		} content: {
 			EditItemColorView(item: item, itemColor: $item.itemColors[selectedColorIndex])
 		}
-    }
+	}
 
 	func addItemColor() {
 		item.itemColors.append(
@@ -95,13 +97,14 @@ struct PressButtonStyle: ButtonStyle {
 
 #Preview {
 	@Previewable @Bindable var item = Item.previewShirt
-	@Previewable @State var itemColors = [ProductColor(	id: UUID(), name: "Indigo",
-								colorFamily: "Indigo",
-								red: 0.1953125,
-								green: 0.171875,
-								blue: 0.45703125,
-														alpha: 1, item: Item.previewShirt)]
-
+	@Previewable @State var itemColors = [ProductColor(	id: UUID(),
+		name: "Indigo",
+		colorFamily: "Indigo",
+		red: 0.1953125,
+		green: 0.171875,
+		blue: 0.45703125,
+		alpha: 1,
+		item: Item.previewShirt)]
 
 	ItemColorBarView(item: $item)
 }

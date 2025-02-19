@@ -12,7 +12,6 @@ import CoreGraphics
 
 extension MyZuriSchemaV2 {
 
-	// TODO: need a DTO for between-contexts?
 	/// `ItemColor` holds information about the colors in the piece.
 	@Observable final class ItemColor: Identifiable, Codable, Equatable, Comparable, Hashable, Sendable {
 		var id: UUID

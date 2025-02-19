@@ -28,23 +28,64 @@ enum SortOption: String, Identifiable, CaseIterable, CustomStringConvertible {
 
 }  // enum
 
+enum WhichTab: Identifiable, CaseIterable {
+	case purchased
+	case wishlist
+
+	var id: Self { self }
+
+	var description: String {
+		switch self {
+		case .purchased: return "Purchased"
+		case .wishlist: return "Wishlist"
+		}
+	}
+}
+
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
 	@State private var editing = false	// toggles editing for subviews
+	@State private var whichTab: WhichTab = .purchased
 
 	@Query var items: [Item]
-	@State private var path: [Item] = []
+
+	@State private var purchasedNavPath: [Item] = []
+	@State private var wishlistNavPath: [Item] = []
+
 	@State private var sortOrder = [
+			SortDescriptor(\Item.itemStatusText),
+			SortDescriptor(\Item.itemCategoryText),
+			SortDescriptor(\Item.name) ]
+	@State private var wishlistSortOrder = [
+			SortDescriptor(\Item.wishlistStatusInt),
 			SortDescriptor(\Item.itemStatusText),
 			SortDescriptor(\Item.itemCategoryText),
 			SortDescriptor(\Item.name) ]
 	@State private var searchText = ""
 
+	#if os(macOS)
+		@State private var backgroundImporter: BackgroundImporter?
+	#endif
+
+
 	var body: some View {
-		NavigationStack(path: $path) {
+		TabView(selection: $whichTab) {
+			purchasedItemsView(path: $purchasedNavPath)
+				.tabItem { Label("Purchased", systemImage: "figure.stand.dress") }
+				.tag(WhichTab.purchased)
+
+			wishlistItemsView(isPurchased: false, path: $wishlistNavPath)
+				.tabItem { Label("Wishlist", systemImage: "lightbulb.max") }
+				.tag(WhichTab.wishlist)
+		}
+	} // body
+
+	func purchasedItemsView(path: Binding<[Item]>) -> some View {
+		NavigationStack(path: path) {
 			VStack {
-				ItemGallery(sort: sortOrder, searchString: searchText,
+				ItemGallery(isPurchased: true, sort: sortOrder, searchString: searchText,
 					editing: $editing)
 					.navigationTitle("My Zuri Items")
 					.navigationDestination(for: Item.self, destination: EditItemView.init)
@@ -54,13 +95,22 @@ struct ContentView: View {
 				.toolbar {
 					Button(action: addItem) {
 						Label("Add Item", systemImage: "plus")
+							.labelStyle(VerticalLabelStyle())
 					}
+					.accessibilityLabel("Add Bag")
 
 					Button {
 						editing.toggle()
 					} label: {
 						Image(systemName: editing ? "pencil.and.scribble" : "pencil.slash" )
 					}
+
+					#if os(macOS)
+					Button(action: wishlistFix) {
+						Label("Wishlist Fix", systemImage: "lightbulb.max.fill")
+							.labelStyle(VerticalLabelStyle())
+					}
+					#endif
 
 					Menu("Sort", systemImage: "arrow.up.arrow.down") {
 						Picker("Sort", selection: $sortOrder) {
@@ -82,11 +132,38 @@ struct ContentView: View {
 
 						} // Picker
 						.pickerStyle(.inline)
+
 					} // Menu
 
 				} // toolbar
 		} // NavigationStack
-	} // body
+
+	}
+
+	#if os(macOS)
+	private func wishlistFix() {
+		withAnimation {
+			Task {
+				try? await backgroundImporter?.itemModelActor.wishlistFix()
+			}
+		}
+	}
+	#endif
+
+
+
+	func wishlistItemsView(isPurchased: Bool, path: Binding<[Item]>) -> some View {
+		NavigationStack(path: path) {
+			VStack {
+				ItemGallery(isPurchased: false, sort: wishlistSortOrder, searchString: searchText,
+					editing: $editing)
+					.navigationTitle("Wishlist Items")
+					.navigationDestination(for: Item.self, destination: EditItemView.init)
+					.padding(10)
+				}
+		} // NavigationStack
+
+	}
 
     private func addItem() {
         withAnimation {

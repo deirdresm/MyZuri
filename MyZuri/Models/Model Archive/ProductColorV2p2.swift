@@ -2,15 +2,21 @@
 //  ProductColor.swift
 //  MyZuri
 //
-//  Created by Deirdre Saoirse Moen on 1/30/25.
+//  Created by Deirdre Saoirse Moen on 2/13/25.
 //
+
 
 import Foundation
 import SwiftData
 import Observation
 import CoreGraphics
 
-extension MyZuriSchemaV2p3 {
+// TODO: DBCHANGE - add a creation date.
+// Generally we want to see the colors in the order they were created
+// (as that is their order of prominence), but don't have a way to
+// easily represent that at present.
+
+extension MyZuriSchemaV2p2 {
 	@Model
 	public class ProductColor: Codable {
 		var id: UUID
@@ -24,8 +30,6 @@ extension MyZuriSchemaV2p3 {
 
 		var item: Item?
 
-		var createdAt: Date?
-
 		init(id: UUID, name: String, colorFamily: String, red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat, item: Item) {
 			self.id = id
 			self.name = name
@@ -35,8 +39,6 @@ extension MyZuriSchemaV2p3 {
 			self.blue = blue
 			self.alpha = alpha
 			self.item = item
-
-			self.createdAt = Date()
 		}
 
 		enum CodingKeys: String, CodingKey {
@@ -47,7 +49,6 @@ extension MyZuriSchemaV2p3 {
 			case green
 			case blue
 			case alpha
-			case createdAt
 		}
 
 		var cgColor: CGColor {
@@ -81,11 +82,9 @@ extension MyZuriSchemaV2p3 {
 			name = try container.decode(String.self, forKey: .name)
 			colorFamily = try container.decode(String.self, forKey: .colorFamily)
 			red = try container.decode(CGFloat.self, forKey: .red)
-			green = try container.decode(CGFloat.self, forKey: .green)
-			blue = try container.decode(CGFloat.self, forKey: .blue)
-			alpha = try container.decode(CGFloat.self, forKey: .alpha)
-			let createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
-			self.createdAt = createdAt ?? Date()
+			green = try container.decode(CGFloat.self, forKey: .red)
+			blue = try container.decode(CGFloat.self, forKey: .red)
+			alpha = try container.decode(CGFloat.self, forKey: .red)
 		}
 
 		public func encode(to encoder: any Encoder) throws {
@@ -97,7 +96,6 @@ extension MyZuriSchemaV2p3 {
 			try container.encode(green, forKey: .green)
 			try container.encode(blue, forKey: .blue)
 			try container.encode(alpha, forKey: .alpha)
-			try container.encode(createdAt, forKey: .createdAt)
 		}
 	}
 }

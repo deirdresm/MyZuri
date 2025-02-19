@@ -13,7 +13,8 @@ struct MyMigrationPlan: SchemaMigrationPlan {
 		MyZuriSchemaV1.self,
 		MyZuriSchemaV2.self,
 		MyZuriSchemaV2p1.self,
-		MyZuriSchemaV2p2.self
+		MyZuriSchemaV2p2.self,
+		MyZuriSchemaV2p3.self
     ]
 
     static var stages: [MigrationStage] = [
@@ -21,7 +22,34 @@ struct MyMigrationPlan: SchemaMigrationPlan {
 		migrateV1toV2,
 		migrateV2toV2p1,
 		migrateV2p1toV2p2,
+		migrateV2p2toV2p3,
     ]
+
+	static let migrateV2p2toV2p3 = MigrationStage.custom(
+		fromVersion: MyZuriSchemaV2p2.self,
+		toVersion: MyZuriSchemaV2p3.self,
+		willMigrate: nil,
+		didMigrate: { context in
+			if let items = try? context.fetch(FetchDescriptor<MyZuriSchemaV2p3.Item>()) {
+
+				for item in items {
+					if item.boughtOn != nil {
+						item.wishlistStatus = WishlistStatus.none // not on the wishlist
+						item.wishlistStatusInt = -1
+					} else {
+						item.wishlistStatus = .newItem // sensible default
+						item.wishlistStatusInt = 0
+					}
+
+					for pc in item.itemColors {
+						pc.createdAt = Date()
+					}
+					try? context.save()
+				}
+			}
+			try? context.save()
+		}
+	)
 
 	static let migrateV2p1toV2p2 = MigrationStage.custom(
 		fromVersion: MyZuriSchemaV2p1.self,
@@ -119,5 +147,17 @@ struct MyZuriSchemaV2p2: VersionedSchema {
 	static var models: [any PersistentModel.Type] = [
 		MyZuriSchemaV2p2.Item.self,
 		MyZuriSchemaV2p2.ProductColor.self
+	]
+}
+
+// 2p3: Several changes:
+// * Add URL field for clickable URLs
+// * Add enum (WishlistType) for Wishlish Item Sorting
+struct MyZuriSchemaV2p3: VersionedSchema {
+	static var versionIdentifier = Schema.Version(2, 3, 0)
+
+	static var models: [any PersistentModel.Type] = [
+		MyZuriSchemaV2p3.Item.self,
+		MyZuriSchemaV2p3.ProductColor.self
 	]
 }
